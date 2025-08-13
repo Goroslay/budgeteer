@@ -1,21 +1,24 @@
 import { User } from '../../domain/entities/User.js'
+import { UserRepository } from '../../domain/UserRepository.js'
 import { prisma } from './prismaClient.js'
 
-export class UserRepositoryPrisma {
-  async create ({
-    fullname,
-    email,
-    username,
-    passwordHash,
-    country
-  }) {
+export class UserRepositoryPrisma extends UserRepository {
+  async createUser (userData) {
+    const {
+      fullname,
+      email,
+      username,
+      _passwordHash: password,
+      country
+    } = userData
+
     try {
       const newUser = await prisma.user.create({
         data: {
           fullname,
           email,
           username,
-          password: passwordHash,
+          password,
           country
         }
       })
@@ -26,38 +29,28 @@ export class UserRepositoryPrisma {
     }
   }
 
-  async findById (user_id) {
+  async findUserById (user_id) {
     const user = await prisma.user.findUnique({
       where: { user_id }
     })
     return user ? this.#toDomain(user) : null
   }
 
-  async findByEmail (email) {
+  async findUserByEmail (email) {
     const user = await prisma.user.findUnique({
       where: { email }
     })
     return user ? this.#toDomain(user) : null
   }
 
-  async findByUserName (username) {
+  async findUserByUserName (username) {
     const user = await prisma.user.findUnique({
       where: { username }
     })
     return user ? this.#toDomain(user) : null
   }
 
-  async list ({ take = 50, skip = 0, active = undefined } = {}) {
-    const users = await prisma.user.findMany({
-      where: active === undefined ? {} : { active },
-      orderBy: { createdAt: 'desc' },
-      take,
-      skip
-    })
-    return users.map(user => this.#toDomain(user))
-  }
-
-  async update (user_id, data) {
+  async updateUser (user_id, data) {
     const updateFields = {}
     const { fullname, email, username, passwordHash, country, active } = data
     if (fullname !== undefined) updateFields.fullname = fullname
@@ -79,7 +72,19 @@ export class UserRepositoryPrisma {
     }
   }
 
-  async activate (user_id) {
+  async deleteUser (user_id) {
+    try {
+      await prisma.user.delete({
+        where: { user_id }
+      })
+      return true
+    } catch (error) {
+      console.error('Error deleting user: ', error)
+      throw new Error('User update failed')
+    }
+  }
+
+  async activateUser (user_id) {
     const user = await prisma.user.update({
       where: { user_id },
       data: { active: true }
@@ -87,12 +92,22 @@ export class UserRepositoryPrisma {
     return this.#toDomain(user)
   }
 
-  async desactivate (user_id) {
+  async desactivateUser (user_id) {
     const user = await prisma.user.update({
       where: { user_id },
       data: { active: false }
     })
     return this.#toDomain(user)
+  }
+
+  async list ({ take = 50, skip = 0, active = undefined } = {}) {
+    const users = await prisma.user.findMany({
+      where: active === undefined ? {} : { active },
+      orderBy: { createdAt: 'desc' },
+      take,
+      skip
+    })
+    return users.map(user => this.#toDomain(user))
   }
 
   #toDomain (user) {

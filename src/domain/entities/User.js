@@ -8,7 +8,7 @@ export class User {
     active = true,
     country,
     createdAt = new Date(),
-    updateAt = new Date()
+    updatedAt = new Date()
   }) {
     this.user_id = user_id
     this.fullname = fullname
@@ -18,7 +18,7 @@ export class User {
     this.active = Boolean(active)
     this.country = country
     this.createdAt = new Date(createdAt)
-    this.updateAt = new Date(updateAt)
+    this.updatedAt = new Date(updatedAt)
   }
 
   static create ({
@@ -36,12 +36,12 @@ export class User {
       country,
       active: true,
       createdAt: new Date(),
-      updateAt: new Date()
+      updatedAt: new Date()
     })
   }
 
   rename (newFullName) {
-    this.fullname(newFullName)
+    this.fullname = newFullName
   }
 
   changeUserName (newUserName) {
