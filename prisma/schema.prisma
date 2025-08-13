@@ -1,0 +1,161 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../prisma/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+model User {
+  user_id             String   @id @default(cuid())
+  fullname            String
+  email               String   @unique
+  username            String @unique
+  password            String
+  active              Boolean @default(true)
+  country             String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  category            Category[]
+  investment          Investment[]
+  budget              Budget[]
+  goal                Goal[]
+  transaction         Transaction[]
+  account             Account[]
+}
+
+model Category{
+  category_id         String @id @default(cuid())
+  name                String
+  user                User @relation(fields: [user_id],references: [user_id])
+  user_id             String
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  budget              Budget[]
+  transaction         Transaction[]
+  @@index([user_id])
+  @@index([user_id,name])
+  @@unique([user_id, name])
+}
+
+model Investment{
+  investment_id       String @id @default(cuid())
+  name                String
+  description         String?
+  initial_investment  Decimal @db.Decimal(14,2)
+  cash_flow           Decimal @db.Decimal(14,2)
+  period_number       Int
+  period              period_type
+  opportunity_rate    Decimal @db.Decimal(14,2)
+  rate                rate_type
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User @relation(fields: [user_id],references: [user_id])
+  user_id             String
+}
+
+model Budget{
+  budget_id           String @id @default(cuid())
+  amount              Decimal @db.Decimal(14,2)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User @relation(fields: [user_id],references: [user_id])
+  user_id             String
+  category            Category @relation(fields: [category_id],references: [category_id])
+  category_id         String
+}
+
+model Goal{
+  goal_id             String @id @default(cuid())
+  current_amount      Decimal @db.Decimal(14,2)
+  name                String
+  target_amount       Decimal @db.Decimal(14,2)
+  initial_date        DateTime
+  target_date         DateTime
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User @relation(fields: [user_id],references: [user_id])
+  user_id             String
+}
+
+model Account{
+  account_id          String @id @default(cuid())
+  name                String
+  type                account_type
+  balance             Decimal @db.Decimal(14,2)
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User @relation(fields: [user_id],references: [user_id])
+  user_id             String
+  transaction         Transaction[]
+  @@index([user_id])
+  @@index([user_id,name])
+  @@unique([user_id, name])
+}
+
+model Transaction{
+  transaction_id      String @id @default(cuid())
+  amount              Decimal @db.Decimal(14,2)
+  currency            currency_type
+  date                DateTime
+  type                transaction_type
+  description         String?
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+  user                User @relation(fields: [user_id],references: [user_id])
+  user_id             String
+  account             Account @relation(fields: [account_id],references: [account_id])
+  account_id          String
+  category            Category @relation(fields: [category_id],references: [category_id])
+  category_id         String
+  @@index([user_id,date])
+  @@index([account_id])
+  @@index([category_id])
+  @@index([type])
+}
+
+enum currency_type{
+  COP
+  USD
+  EUR
+}
+
+enum transaction_type{
+  income
+  expense
+}
+
+enum account_type{
+  cash
+  bank
+  card
+  wallet
+  other
+}
+
+enum period_type{
+  month
+  quarter
+  semester
+  annual
+}
+
+enum rate_type{
+  monthlyNominal
+  quarterNominal
+  semesterNominal
+  annualNominal
+  monthlyEffective
+  quarterEffective
+  semesterEffective
+  annualEffective
+}
