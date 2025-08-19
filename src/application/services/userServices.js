@@ -1,4 +1,5 @@
 import { User } from '../../domain/entities/User.js'
+import { LoginUserDTO, RegisterUserDTO, UpdateUserDTO } from '../dto/userDTO.js'
 export class UserService {
   constructor (userRespository, passwordHasher, tokenGenerator) {
     this.userRespository = userRespository
@@ -6,16 +7,13 @@ export class UserService {
     this.tokenGenerator = tokenGenerator
   }
 
-  async registerUser ({
-    fullname,
-    email,
-    username,
-    password,
-    country
-  }) {
+  async registerUser (registerUserRequest) {
+    const registerUserDTO = new RegisterUserDTO(registerUserRequest)
+    const userData = registerUserDTO.toDomain()
+    const { email, username, fullname, password, country } = userData
     const [byEmail, byUsername] = await Promise.all([
       this.userRespository.findUserByEmail(email),
-      this.userRespository.findUserByUserName(username)
+      this.userRespository.findUserByUsername(username)
     ])
     if (byEmail) throw new Error('Email duplicated')
     if (byUsername) throw new Error('Username duplicated')
@@ -30,7 +28,7 @@ export class UserService {
     })
 
     const savedUser = await this.userRespository.createUser(newUser)
-    const token = this.tokenGenerator.generateJWT(savedUser.user_id)
+    const token = this.tokenGenerator.generate(savedUser.user_id)
 
     return {
       data: savedUser.toObjectSafe(),
@@ -38,25 +36,66 @@ export class UserService {
     }
   }
 
-  async loginUser ({
-    username = null,
-    email = null,
-    password
-  }) {
+  async loginUser (loginUserRequest) {
+    const loginUserDTO = new LoginUserDTO(loginUserRequest)
+    const userData = loginUserDTO.toDomain()
+    const { username, email, password } = userData
     if (!username && !email) throw new Error('Username or email is required')
     if (!password) throw new Error('Password is required')
-    const user = username ? await this.userRespository.findUserByUserName(username) : await this.userRespository.findUserByEmail(email)
+    const user = username ? await this.userRespository.findUserByUsername(username) : await this.userRespository.findUserByEmail(email)
     if (!user) throw new Error('Invalid credentials')
 
     const isValidPassword = await this.passwordHasher.compare(password, user._passwordHash)
     if (!isValidPassword) throw new Error('Invalid credentials')
 
-    const token = this.tokenGenerator.generateJWT(user.user_id)
+    const token = this.tokenGenerator.generate(user.user_id)
 
     return {
-      success: true,
       data: user.toObjectSafe(),
       token
+    }
+  }
+
+  async updateUser (updateUserRequest) {
+    const updateUserDto = new UpdateUserDTO(updateUserRequest)
+    const { user_id, username, fullname, country, email, password } = updateUserDto.toDomain()
+    const user = await this.userRespository.findUserById(user_id)
+    if (!user) throw new Error('Invalid User')
+    if (username) {
+      const byUsername = await this.userRespository.findUserByUsername(username)
+      if (byUsername && byUsername.user_id !== user_id) throw new Error('Username duplicated')
+    }
+    if (email) {
+      const byEmail = await this.userRespository.findUserByEmail(email)
+      if (byEmail && byEmail.user_id !== user_id) throw new Error('Email duplicated')
+    }
+    let passwordHash = password
+    if (password) {
+      passwordHash = await this.passwordHasher.hash(password)
+    }
+    const updatedUser = await this.userRespository.updateUser(user_id, { username, fullname, country, email, passwordHash })
+
+    return {
+      data: updatedUser.toObjectSafe()
+    }
+  }
+
+  async listUsers (listUsersRequest) {
+    const id = listUsersRequest.user_id || undefined
+    const filters = listUsersRequest.filters || undefined
+
+    if (id) {
+      const userFind = await this.userRespository.findUserById(id)
+      return {
+        data: userFind.toObjectSafe(),
+        length: 1
+      }
+    }
+
+    const usersFind = await this.userRespository.list(filters)
+    return {
+      length: usersFind.length,
+      data: usersFind.map(user => user.toObjectSafe())
     }
   }
 }

@@ -1,14 +1,16 @@
 import bcrypt from 'bcryptjs'
-export class BcryptService {
+import { PasswordHasherPort } from '../../domain/ports/PasswordHasherPort.js'
+export class BcryptService extends PasswordHasherPort {
   constructor (rounds = 10) {
+    super()
     this.rounds = rounds
   }
 
-  async hash (plain) {
-    return bcrypt.hash(plain, this.rounds)
+  async hash (password) {
+    return bcrypt.hash(password, this.rounds)
   }
 
-  async compare (plain, hash) {
-    return bcrypt.compare(plain, hash)
+  async compare (password, hash) {
+    return bcrypt.compare(password, hash)
   }
 }

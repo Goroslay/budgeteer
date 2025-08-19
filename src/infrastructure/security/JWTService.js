@@ -1,17 +1,19 @@
 import jwt from 'jsonwebtoken'
 import { env } from '../../config/env.js'
+import { TokenGeneratorPort } from '../../domain/ports/TokenGeneratorPort.js'
 
-export class JWTService {
+export class JWTService extends TokenGeneratorPort {
   constructor (secret = env.jwtSecret, expiresIn = env.jwtExpireIn) {
+    super()
     this.secret = secret
     this.expiresIn = expiresIn
   }
 
-  generateJWT (userId) {
-    return jwt.sign({ userId }, this.secret, { expiresIn: this.expiresIn })
+  generate (payload) {
+    return jwt.sign({ payload }, this.secret, { expiresIn: this.expiresIn })
   }
 
-  validateJWT (token) {
+  validate (token) {
     return jwt.verify(token, this.secret)
   }
 }

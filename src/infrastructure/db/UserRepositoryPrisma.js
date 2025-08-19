@@ -1,8 +1,8 @@
 import { User } from '../../domain/entities/User.js'
-import { UserRepository } from '../../domain/UserRepository.js'
+import { UserRepositoryPort } from '../../domain/ports/UserRepositoryPort.js'
 import { prisma } from './prismaClient.js'
 
-export class UserRepositoryPrisma extends UserRepository {
+export class UserRepositoryPrisma extends UserRepositoryPort {
   async createUser (userData) {
     const {
       fullname,
@@ -43,7 +43,7 @@ export class UserRepositoryPrisma extends UserRepository {
     return user ? this.#toDomain(user) : null
   }
 
-  async findUserByUserName (username) {
+  async findUserByUsername (username) {
     const user = await prisma.user.findUnique({
       where: { username }
     })
@@ -80,7 +80,7 @@ export class UserRepositoryPrisma extends UserRepository {
       return true
     } catch (error) {
       console.error('Error deleting user: ', error)
-      throw new Error('User update failed')
+      throw new Error('User delete failed')
     }
   }
 
@@ -100,9 +100,9 @@ export class UserRepositoryPrisma extends UserRepository {
     return this.#toDomain(user)
   }
 
-  async list ({ take = 50, skip = 0, active = undefined } = {}) {
+  async list ({ where = {}, take = 50, skip = 0 } = {}) {
     const users = await prisma.user.findMany({
-      where: active === undefined ? {} : { active },
+      where,
       orderBy: { createdAt: 'desc' },
       take,
       skip

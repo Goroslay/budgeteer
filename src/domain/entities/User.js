@@ -65,10 +65,7 @@ export class User {
       fullname: this.fullname,
       email: this.email,
       username: this.username,
-      active: this.active,
-      country: this.country,
-      createdAt: this.createdAt,
-      updatedAt: this.updatedAt
+      country: this.country
     }
   }
 }

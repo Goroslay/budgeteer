@@ -1,4 +1,4 @@
-export class UserRepository {
+export class UserRepositoryPort {
   async findUserByEmail (email) {
     throw new Error('Method findUserByEmail must be implemented')
   }
@@ -23,11 +23,15 @@ export class UserRepository {
     throw new Error('Method deleteUser must be implemented')
   }
 
-  async activateUser (userId) {
-    throw new Error('Method existsByEmail must be implemented')
+  async list (filters) {
+    throw new Error('Method list must be implemented')
   }
 
-  async desactivateUser (userId) {
-    throw new Error('Method existsByUsername must be implemented')
+  async activateUser (userId) {
+    throw new Error('Method activateUser must be implemented')
+  }
+
+  async deactivateUser (userId) {
+    throw new Error('Method deactivateUser must be implemented')
   }
 }
