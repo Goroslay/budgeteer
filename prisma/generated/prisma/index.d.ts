@@ -53,7 +53,15 @@ export type Transaction = $Result.DefaultSelection<Prisma.$TransactionPayload>
  * Enums
  */
 export namespace $Enums {
-  export const currency_type: {
+  export const user_role: {
+  user: 'user',
+  admin: 'admin'
+};
+
+export type user_role = (typeof user_role)[keyof typeof user_role]
+
+
+export const currency_type: {
   COP: 'COP',
   USD: 'USD',
   EUR: 'EUR'
@@ -105,6 +113,10 @@ export const rate_type: {
 export type rate_type = (typeof rate_type)[keyof typeof rate_type]
 
 }
+
+export type user_role = $Enums.user_role
+
+export const user_role: typeof $Enums.user_role
 
 export type currency_type = $Enums.currency_type
 
@@ -1671,6 +1683,7 @@ export namespace Prisma {
     country: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    role: $Enums.user_role | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -1683,6 +1696,7 @@ export namespace Prisma {
     country: string | null
     createdAt: Date | null
     updatedAt: Date | null
+    role: $Enums.user_role | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -1695,6 +1709,7 @@ export namespace Prisma {
     country: number
     createdAt: number
     updatedAt: number
+    role: number
     _all: number
   }
 
@@ -1709,6 +1724,7 @@ export namespace Prisma {
     country?: true
     createdAt?: true
     updatedAt?: true
+    role?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -1721,6 +1737,7 @@ export namespace Prisma {
     country?: true
     createdAt?: true
     updatedAt?: true
+    role?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -1733,6 +1750,7 @@ export namespace Prisma {
     country?: true
     createdAt?: true
     updatedAt?: true
+    role?: true
     _all?: true
   }
 
@@ -1818,6 +1836,7 @@ export namespace Prisma {
     country: string
     createdAt: Date
     updatedAt: Date
+    role: $Enums.user_role
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -1847,6 +1866,7 @@ export namespace Prisma {
     country?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    role?: boolean
     category?: boolean | User$categoryArgs<ExtArgs>
     investment?: boolean | User$investmentArgs<ExtArgs>
     budget?: boolean | User$budgetArgs<ExtArgs>
@@ -1866,6 +1886,7 @@ export namespace Prisma {
     country?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    role?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -1878,6 +1899,7 @@ export namespace Prisma {
     country?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    role?: boolean
   }, ExtArgs["result"]["user"]>
 
   export type UserSelectScalar = {
@@ -1890,9 +1912,10 @@ export namespace Prisma {
     country?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    role?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"user_id" | "fullname" | "email" | "username" | "password" | "active" | "country" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"user_id" | "fullname" | "email" | "username" | "password" | "active" | "country" | "createdAt" | "updatedAt" | "role", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     category?: boolean | User$categoryArgs<ExtArgs>
     investment?: boolean | User$investmentArgs<ExtArgs>
@@ -1925,6 +1948,7 @@ export namespace Prisma {
       country: string
       createdAt: Date
       updatedAt: Date
+      role: $Enums.user_role
     }, ExtArgs["result"]["user"]>
     composites: {}
   }
@@ -2363,6 +2387,7 @@ export namespace Prisma {
     readonly country: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
+    readonly role: FieldRef<"User", 'user_role'>
   }
     
 
@@ -9842,7 +9867,8 @@ export namespace Prisma {
     active: 'active',
     country: 'country',
     createdAt: 'createdAt',
-    updatedAt: 'updatedAt'
+    updatedAt: 'updatedAt',
+    role: 'role'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -9999,6 +10025,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'user_role'
+   */
+  export type Enumuser_roleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'user_role'>
+    
+
+
+  /**
+   * Reference to a field of type 'user_role[]'
+   */
+  export type ListEnumuser_roleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'user_role[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Decimal'
    */
   export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
@@ -10126,6 +10166,7 @@ export namespace Prisma {
     country?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    role?: Enumuser_roleFilter<"User"> | $Enums.user_role
     category?: CategoryListRelationFilter
     investment?: InvestmentListRelationFilter
     budget?: BudgetListRelationFilter
@@ -10144,6 +10185,7 @@ export namespace Prisma {
     country?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    role?: SortOrder
     category?: CategoryOrderByRelationAggregateInput
     investment?: InvestmentOrderByRelationAggregateInput
     budget?: BudgetOrderByRelationAggregateInput
@@ -10165,6 +10207,7 @@ export namespace Prisma {
     country?: StringFilter<"User"> | string
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    role?: Enumuser_roleFilter<"User"> | $Enums.user_role
     category?: CategoryListRelationFilter
     investment?: InvestmentListRelationFilter
     budget?: BudgetListRelationFilter
@@ -10183,6 +10226,7 @@ export namespace Prisma {
     country?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    role?: SortOrder
     _count?: UserCountOrderByAggregateInput
     _max?: UserMaxOrderByAggregateInput
     _min?: UserMinOrderByAggregateInput
@@ -10201,6 +10245,7 @@ export namespace Prisma {
     country?: StringWithAggregatesFilter<"User"> | string
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+    role?: Enumuser_roleWithAggregatesFilter<"User"> | $Enums.user_role
   }
 
   export type CategoryWhereInput = {
@@ -10673,6 +10718,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
     category?: CategoryCreateNestedManyWithoutUserInput
     investment?: InvestmentCreateNestedManyWithoutUserInput
     budget?: BudgetCreateNestedManyWithoutUserInput
@@ -10691,6 +10737,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
     category?: CategoryUncheckedCreateNestedManyWithoutUserInput
     investment?: InvestmentUncheckedCreateNestedManyWithoutUserInput
     budget?: BudgetUncheckedCreateNestedManyWithoutUserInput
@@ -10709,6 +10756,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
     category?: CategoryUpdateManyWithoutUserNestedInput
     investment?: InvestmentUpdateManyWithoutUserNestedInput
     budget?: BudgetUpdateManyWithoutUserNestedInput
@@ -10727,6 +10775,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
     category?: CategoryUncheckedUpdateManyWithoutUserNestedInput
     investment?: InvestmentUncheckedUpdateManyWithoutUserNestedInput
     budget?: BudgetUncheckedUpdateManyWithoutUserNestedInput
@@ -10745,6 +10794,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
   }
 
   export type UserUpdateManyMutationInput = {
@@ -10757,6 +10807,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -10769,6 +10820,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
   }
 
   export type CategoryCreateInput = {
@@ -11281,6 +11333,13 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type Enumuser_roleFilter<$PrismaModel = never> = {
+    equals?: $Enums.user_role | Enumuser_roleFieldRefInput<$PrismaModel>
+    in?: $Enums.user_role[] | ListEnumuser_roleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.user_role[] | ListEnumuser_roleFieldRefInput<$PrismaModel>
+    not?: NestedEnumuser_roleFilter<$PrismaModel> | $Enums.user_role
+  }
+
   export type CategoryListRelationFilter = {
     every?: CategoryWhereInput
     some?: CategoryWhereInput
@@ -11351,6 +11410,7 @@ export namespace Prisma {
     country?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    role?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -11363,6 +11423,7 @@ export namespace Prisma {
     country?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    role?: SortOrder
   }
 
   export type UserMinOrderByAggregateInput = {
@@ -11375,6 +11436,7 @@ export namespace Prisma {
     country?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    role?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -11415,6 +11477,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type Enumuser_roleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.user_role | Enumuser_roleFieldRefInput<$PrismaModel>
+    in?: $Enums.user_role[] | ListEnumuser_roleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.user_role[] | ListEnumuser_roleFieldRefInput<$PrismaModel>
+    not?: NestedEnumuser_roleWithAggregatesFilter<$PrismaModel> | $Enums.user_role
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumuser_roleFilter<$PrismaModel>
+    _max?: NestedEnumuser_roleFilter<$PrismaModel>
   }
 
   export type UserScalarRelationFilter = {
@@ -11967,6 +12039,10 @@ export namespace Prisma {
     set?: Date | string
   }
 
+  export type Enumuser_roleFieldUpdateOperationsInput = {
+    set?: $Enums.user_role
+  }
+
   export type CategoryUpdateManyWithoutUserNestedInput = {
     create?: XOR<CategoryCreateWithoutUserInput, CategoryUncheckedCreateWithoutUserInput> | CategoryCreateWithoutUserInput[] | CategoryUncheckedCreateWithoutUserInput[]
     connectOrCreate?: CategoryCreateOrConnectWithoutUserInput | CategoryCreateOrConnectWithoutUserInput[]
@@ -12457,6 +12533,13 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type NestedEnumuser_roleFilter<$PrismaModel = never> = {
+    equals?: $Enums.user_role | Enumuser_roleFieldRefInput<$PrismaModel>
+    in?: $Enums.user_role[] | ListEnumuser_roleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.user_role[] | ListEnumuser_roleFieldRefInput<$PrismaModel>
+    not?: NestedEnumuser_roleFilter<$PrismaModel> | $Enums.user_role
+  }
+
   export type NestedStringWithAggregatesFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -12505,6 +12588,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumuser_roleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.user_role | Enumuser_roleFieldRefInput<$PrismaModel>
+    in?: $Enums.user_role[] | ListEnumuser_roleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.user_role[] | ListEnumuser_roleFieldRefInput<$PrismaModel>
+    not?: NestedEnumuser_roleWithAggregatesFilter<$PrismaModel> | $Enums.user_role
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumuser_roleFilter<$PrismaModel>
+    _max?: NestedEnumuser_roleFilter<$PrismaModel>
   }
 
   export type NestedStringNullableFilter<$PrismaModel = never> = {
@@ -13070,6 +13163,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
     investment?: InvestmentCreateNestedManyWithoutUserInput
     budget?: BudgetCreateNestedManyWithoutUserInput
     goal?: GoalCreateNestedManyWithoutUserInput
@@ -13087,6 +13181,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
     investment?: InvestmentUncheckedCreateNestedManyWithoutUserInput
     budget?: BudgetUncheckedCreateNestedManyWithoutUserInput
     goal?: GoalUncheckedCreateNestedManyWithoutUserInput
@@ -13182,6 +13277,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
     investment?: InvestmentUpdateManyWithoutUserNestedInput
     budget?: BudgetUpdateManyWithoutUserNestedInput
     goal?: GoalUpdateManyWithoutUserNestedInput
@@ -13199,6 +13295,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
     investment?: InvestmentUncheckedUpdateManyWithoutUserNestedInput
     budget?: BudgetUncheckedUpdateManyWithoutUserNestedInput
     goal?: GoalUncheckedUpdateManyWithoutUserNestedInput
@@ -13248,6 +13345,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
     category?: CategoryCreateNestedManyWithoutUserInput
     budget?: BudgetCreateNestedManyWithoutUserInput
     goal?: GoalCreateNestedManyWithoutUserInput
@@ -13265,6 +13363,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
     category?: CategoryUncheckedCreateNestedManyWithoutUserInput
     budget?: BudgetUncheckedCreateNestedManyWithoutUserInput
     goal?: GoalUncheckedCreateNestedManyWithoutUserInput
@@ -13298,6 +13397,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
     category?: CategoryUpdateManyWithoutUserNestedInput
     budget?: BudgetUpdateManyWithoutUserNestedInput
     goal?: GoalUpdateManyWithoutUserNestedInput
@@ -13315,6 +13415,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
     category?: CategoryUncheckedUpdateManyWithoutUserNestedInput
     budget?: BudgetUncheckedUpdateManyWithoutUserNestedInput
     goal?: GoalUncheckedUpdateManyWithoutUserNestedInput
@@ -13332,6 +13433,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
     category?: CategoryCreateNestedManyWithoutUserInput
     investment?: InvestmentCreateNestedManyWithoutUserInput
     goal?: GoalCreateNestedManyWithoutUserInput
@@ -13349,6 +13451,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
     category?: CategoryUncheckedCreateNestedManyWithoutUserInput
     investment?: InvestmentUncheckedCreateNestedManyWithoutUserInput
     goal?: GoalUncheckedCreateNestedManyWithoutUserInput
@@ -13405,6 +13508,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
     category?: CategoryUpdateManyWithoutUserNestedInput
     investment?: InvestmentUpdateManyWithoutUserNestedInput
     goal?: GoalUpdateManyWithoutUserNestedInput
@@ -13422,6 +13526,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
     category?: CategoryUncheckedUpdateManyWithoutUserNestedInput
     investment?: InvestmentUncheckedUpdateManyWithoutUserNestedInput
     goal?: GoalUncheckedUpdateManyWithoutUserNestedInput
@@ -13468,6 +13573,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
     category?: CategoryCreateNestedManyWithoutUserInput
     investment?: InvestmentCreateNestedManyWithoutUserInput
     budget?: BudgetCreateNestedManyWithoutUserInput
@@ -13485,6 +13591,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
     category?: CategoryUncheckedCreateNestedManyWithoutUserInput
     investment?: InvestmentUncheckedCreateNestedManyWithoutUserInput
     budget?: BudgetUncheckedCreateNestedManyWithoutUserInput
@@ -13518,6 +13625,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
     category?: CategoryUpdateManyWithoutUserNestedInput
     investment?: InvestmentUpdateManyWithoutUserNestedInput
     budget?: BudgetUpdateManyWithoutUserNestedInput
@@ -13535,6 +13643,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
     category?: CategoryUncheckedUpdateManyWithoutUserNestedInput
     investment?: InvestmentUncheckedUpdateManyWithoutUserNestedInput
     budget?: BudgetUncheckedUpdateManyWithoutUserNestedInput
@@ -13552,6 +13661,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
     category?: CategoryCreateNestedManyWithoutUserInput
     investment?: InvestmentCreateNestedManyWithoutUserInput
     budget?: BudgetCreateNestedManyWithoutUserInput
@@ -13569,6 +13679,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
     category?: CategoryUncheckedCreateNestedManyWithoutUserInput
     investment?: InvestmentUncheckedCreateNestedManyWithoutUserInput
     budget?: BudgetUncheckedCreateNestedManyWithoutUserInput
@@ -13638,6 +13749,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
     category?: CategoryUpdateManyWithoutUserNestedInput
     investment?: InvestmentUpdateManyWithoutUserNestedInput
     budget?: BudgetUpdateManyWithoutUserNestedInput
@@ -13655,6 +13767,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
     category?: CategoryUncheckedUpdateManyWithoutUserNestedInput
     investment?: InvestmentUncheckedUpdateManyWithoutUserNestedInput
     budget?: BudgetUncheckedUpdateManyWithoutUserNestedInput
@@ -13688,6 +13801,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
     category?: CategoryCreateNestedManyWithoutUserInput
     investment?: InvestmentCreateNestedManyWithoutUserInput
     budget?: BudgetCreateNestedManyWithoutUserInput
@@ -13705,6 +13819,7 @@ export namespace Prisma {
     country: string
     createdAt?: Date | string
     updatedAt?: Date | string
+    role?: $Enums.user_role
     category?: CategoryUncheckedCreateNestedManyWithoutUserInput
     investment?: InvestmentUncheckedCreateNestedManyWithoutUserInput
     budget?: BudgetUncheckedCreateNestedManyWithoutUserInput
@@ -13786,6 +13901,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
     category?: CategoryUpdateManyWithoutUserNestedInput
     investment?: InvestmentUpdateManyWithoutUserNestedInput
     budget?: BudgetUpdateManyWithoutUserNestedInput
@@ -13803,6 +13919,7 @@ export namespace Prisma {
     country?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    role?: Enumuser_roleFieldUpdateOperationsInput | $Enums.user_role
     category?: CategoryUncheckedUpdateManyWithoutUserNestedInput
     investment?: InvestmentUncheckedUpdateManyWithoutUserNestedInput
     budget?: BudgetUncheckedUpdateManyWithoutUserNestedInput

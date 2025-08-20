@@ -129,7 +129,8 @@ exports.Prisma.UserScalarFieldEnum = {
   active: 'active',
   country: 'country',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  role: 'role'
 };
 
 exports.Prisma.CategoryScalarFieldEnum = {
@@ -214,6 +215,11 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.user_role = exports.$Enums.user_role = {
+  user: 'user',
+  admin: 'admin'
+};
+
 exports.period_type = exports.$Enums.period_type = {
   month: 'month',
   quarter: 'quarter',

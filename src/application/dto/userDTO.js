@@ -1,5 +1,5 @@
 class UserDTO {
-  _normalizeName (name) {
+  _normalizeFullname (name) {
     return name?.trim()
       .split(' ')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
@@ -28,7 +28,7 @@ export class RegisterUserDTO extends UserDTO {
     password
   }) {
     super()
-    this.fullname = this._normalizeName(fullname)
+    this.fullname = this._normalizeFullname(fullname)
     this.username = this._normalizeUsername(username)
     this.email = this._normalizeEmail(email)
     this.country = this._normalizeCountry(country)
@@ -111,6 +111,49 @@ export class UpdateUserDTO extends UserDTO {
     if (this.email !== undefined) domain.email = this.email
     if (this.active !== undefined) domain.active = this.active
     if (this.password !== undefined) domain.password = this.password
+    return domain
+  }
+}
+
+export class ListUserDTO extends UserDTO {
+  constructor ({
+    user_id,
+    fullname,
+    username,
+    email,
+    country,
+    active,
+    take,
+    skip
+  } = {}) {
+    super()
+    this.user_id = user_id
+    this.fullname = fullname ? this._normalizeFullname(fullname) : undefined
+    this.username = username ? this._normalizeUsername(username) : undefined
+    this.email = email ? this._normalizeEmail(email) : undefined
+    this.country = country ? this._normalizeCountry(country) : undefined
+    this.active = active !== undefined ? active : undefined
+    this.take = take ? Number(take) : undefined
+    this.skip = skip ? Number(skip) : undefined
+    Object.freeze(this)
+  }
+
+  static fromQuery (object = {}) {
+    const { user_id, fullname, username, email, country, active, take, skip } = object
+    return new ListUserDTO({ user_id, fullname, username, email, country, active, take, skip })
+  }
+
+  toDomain () {
+    const where = {}
+    if (this.user_id !== undefined) where.user_id = this.user_id
+    if (this.fullname !== undefined) where.fullname = this.fullname
+    if (this.username !== undefined) where.username = this.username
+    if (this.email !== undefined) where.email = this.email
+    if (this.country !== undefined) where.country = this.country
+    if (this.active !== undefined) where.active = this.active
+    const domain = { where }
+    if (this.take !== undefined) domain.take = this.take
+    if (this.skip !== undefined) domain.skip = this.skip
     return domain
   }
 }

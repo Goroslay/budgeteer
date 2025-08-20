@@ -25,6 +25,7 @@ model User {
   country     String
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
+  role        user_role     @default(user)
   category    Category[]
   investment  Investment[]
   budget      Budget[]
@@ -124,6 +125,11 @@ model Transaction {
   @@index([account_id])
   @@index([category_id])
   @@index([type])
+}
+
+enum user_role {
+  user
+  admin
 }
 
 enum currency_type {

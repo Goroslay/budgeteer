@@ -1,5 +1,5 @@
 import { User } from '../../domain/entities/User.js'
-import { LoginUserDTO, RegisterUserDTO, UpdateUserDTO } from '../dto/userDTO.js'
+import { ListUserDTO, LoginUserDTO, RegisterUserDTO, UpdateUserDTO } from '../dto/userDTO.js'
 export class UserService {
   constructor (userRespository, passwordHasher, tokenGenerator) {
     this.userRespository = userRespository
@@ -80,18 +80,22 @@ export class UserService {
     }
   }
 
-  async listUsers (listUsersRequest) {
-    const id = listUsersRequest.user_id || undefined
-    const filters = listUsersRequest.filters || undefined
-
-    if (id) {
-      const userFind = await this.userRespository.findUserById(id)
-      return {
-        data: userFind.toObjectSafe(),
-        length: 1
-      }
+  async listUsers (listUsersRequest = {}) {
+    const listQuery = { ...listUsersRequest.where, take: listUsersRequest.take, skip: listUsersRequest.skip }
+    const listUserDTO = ListUserDTO.fromQuery(listQuery)
+    if (listUserDTO.user_id) {
+      const userFind = await this.userRespository.findUserById(listUserDTO.user_id)
+      return userFind
+        ? {
+            data: userFind.toObjectSafe(),
+            length: 1
+          }
+        : {
+            data: [],
+            length: 0
+          }
     }
-
+    const filters = listUserDTO.toDomain()
     const usersFind = await this.userRespository.list(filters)
     return {
       length: usersFind.length,

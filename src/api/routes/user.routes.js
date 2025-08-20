@@ -1,12 +1,12 @@
 import { Router } from 'express'
-import { loginUser, registerUser, updateUser } from '../controllers/user.controller.js'
-import { validateRequest } from '../middleware/validateRequest.js'
-import { createUserValidator } from '../validators/userValidator.js'
+import { listUsers, updateUser } from '../controllers/user.controller.js'
 
 const userRouter = Router()
 
-userRouter.post('/register', createUserValidator, validateRequest, registerUser)
-userRouter.post('/login', loginUser)
+/*
+    DELETE /users/:id
+*/
 userRouter.put('/:id', updateUser)
+userRouter.get('/', listUsers)
 
 export default userRouter
