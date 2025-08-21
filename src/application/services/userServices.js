@@ -1,5 +1,5 @@
 import { User } from '../../domain/entities/User.js'
-import { ListUserDTO, LoginUserDTO, RegisterUserDTO, UpdateUserDTO } from '../dto/userDTO.js'
+import { ListUserDTO, LoginUserDTO, RegisterUserDTO, UpdateMeDTO } from '../dto/userDTO.js'
 export class UserService {
   constructor (userRespository, passwordHasher, tokenGenerator) {
     this.userRespository = userRespository
@@ -28,7 +28,7 @@ export class UserService {
     })
 
     const savedUser = await this.userRespository.createUser(newUser)
-    const token = this.tokenGenerator.generate(savedUser.user_id)
+    const token = this.tokenGenerator.generate({ id: savedUser.user_id, role: savedUser.role })
 
     return {
       data: savedUser.toObjectSafe(),
@@ -48,7 +48,7 @@ export class UserService {
     const isValidPassword = await this.passwordHasher.compare(password, user._passwordHash)
     if (!isValidPassword) throw new Error('Invalid credentials')
 
-    const token = this.tokenGenerator.generate(user.user_id)
+    const token = this.tokenGenerator.generate({ id: user.user_id, role: user.role })
 
     return {
       data: user.toObjectSafe(),
@@ -56,25 +56,21 @@ export class UserService {
     }
   }
 
-  async updateUser (updateUserRequest) {
-    const updateUserDto = new UpdateUserDTO(updateUserRequest)
-    const { user_id, username, fullname, country, email, password } = updateUserDto.toDomain()
-    const user = await this.userRespository.findUserById(user_id)
-    if (!user) throw new Error('Invalid User')
+  async updateMe (updateMeRequest) {
+    const updateMeDto = new UpdateMeDTO(updateMeRequest)
+    const { token, username, fullname, country, email } = updateMeDto.toDomain()
+    const userDecoded = await this.#decodedToken(token)
+    const id = userDecoded.user_id
+    console.log(userDecoded)
     if (username) {
       const byUsername = await this.userRespository.findUserByUsername(username)
-      if (byUsername && byUsername.user_id !== user_id) throw new Error('Username duplicated')
+      if (byUsername && byUsername.user_id !== id) throw new Error('Username duplicated')
     }
     if (email) {
       const byEmail = await this.userRespository.findUserByEmail(email)
-      if (byEmail && byEmail.user_id !== user_id) throw new Error('Email duplicated')
+      if (byEmail && byEmail.user_id !== id) throw new Error('Email duplicated')
     }
-    let passwordHash = password
-    if (password) {
-      passwordHash = await this.passwordHasher.hash(password)
-    }
-    const updatedUser = await this.userRespository.updateUser(user_id, { username, fullname, country, email, passwordHash })
-
+    const updatedUser = await this.userRespository.updateMe(id, { username, fullname, country, email })
     return {
       data: updatedUser.toObjectSafe()
     }
@@ -83,6 +79,9 @@ export class UserService {
   async listUsers (listUsersRequest = {}) {
     const listQuery = { ...listUsersRequest.where, take: listUsersRequest.take, skip: listUsersRequest.skip }
     const listUserDTO = ListUserDTO.fromQuery(listQuery)
+    const token = listUsersRequest.token
+    const userDecoded = await this.#decodedToken(token)
+    if (userDecoded.role !== 'admin') throw new Error('Invalid authorization')
     if (listUserDTO.user_id) {
       const userFind = await this.userRespository.findUserById(listUserDTO.user_id)
       return userFind
@@ -101,5 +100,22 @@ export class UserService {
       length: usersFind.length,
       data: usersFind.map(user => user.toObjectSafe())
     }
+  }
+
+  async listMe (token) {
+    const userDecoded = await this.#decodedToken(token)
+    return {
+      data: userDecoded.toObjectSafe()
+    }
+  }
+
+  async #decodedToken (token) {
+    const decoded = this.tokenGenerator.validate(token)
+    const { id } = decoded.payload
+    if (!id) throw new Error('Invalid authorization')
+    const userDecoded = await this.userRespository.findUserById(id)
+    console.log(userDecoded)
+    if (!userDecoded) throw new Error('Invalid User')
+    return userDecoded
   }
 }

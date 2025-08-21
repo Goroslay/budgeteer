@@ -76,48 +76,42 @@ export class LoginUserDTO extends UserDTO {
   }
 }
 
-export class UpdateUserDTO extends UserDTO {
+export class UpdateMeDTO extends UserDTO {
   constructor ({
-    user_id,
+    token,
     username = undefined,
     fullname = undefined,
     country = undefined,
-    email = undefined,
-    password = undefined,
-    active = undefined
+    email = undefined
   }) {
     super()
-    this.user_id = user_id
+    this.token = token
     this.username = username ? this._normalizeUsername(username) : undefined
-    this.fullname = fullname ? this._normalizeName(fullname) : undefined
+    this.fullname = fullname ? this._normalizeFullname(fullname) : undefined
     this.country = country ? this._normalizeCountry(country) : undefined
     this.email = email ? this._normalizeEmail(email) : undefined
-    this.password = password || undefined
-    this.active = active !== undefined ? active : undefined
     Object.freeze(this)
   }
 
   static fromObject (object = {}) {
-    const { user_id, username, fullname, country, email, password, active } = object
-    return new UpdateUserDTO({ user_id, username, fullname, country, email, password, active })
+    const { token, username, fullname, country, email } = object
+    return new UpdateMeDTO({ token, username, fullname, country, email })
   }
 
   toDomain () {
     const domain = {}
-    domain.user_id = this.user_id
+    domain.token = this.token
     if (this.username !== undefined) domain.username = this.username
     if (this.fullname !== undefined) domain.fullname = this.fullname
     if (this.country !== undefined) domain.country = this.country
     if (this.email !== undefined) domain.email = this.email
-    if (this.active !== undefined) domain.active = this.active
-    if (this.password !== undefined) domain.password = this.password
     return domain
   }
 }
 
 export class ListUserDTO extends UserDTO {
   constructor ({
-    user_id,
+    id,
     fullname,
     username,
     email,
@@ -127,7 +121,7 @@ export class ListUserDTO extends UserDTO {
     skip
   } = {}) {
     super()
-    this.user_id = user_id
+    this.user_id = id
     this.fullname = fullname ? this._normalizeFullname(fullname) : undefined
     this.username = username ? this._normalizeUsername(username) : undefined
     this.email = email ? this._normalizeEmail(email) : undefined
@@ -139,8 +133,8 @@ export class ListUserDTO extends UserDTO {
   }
 
   static fromQuery (object = {}) {
-    const { user_id, fullname, username, email, country, active, take, skip } = object
-    return new ListUserDTO({ user_id, fullname, username, email, country, active, take, skip })
+    const { id, fullname, username, email, country, active, take, skip } = object
+    return new ListUserDTO({ id, fullname, username, email, country, active, take, skip })
   }
 
   toDomain () {

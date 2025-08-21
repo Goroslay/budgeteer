@@ -29,9 +29,9 @@ export class UserRepositoryPrisma extends UserRepositoryPort {
     }
   }
 
-  async findUserById (user_id) {
+  async findUserById (id) {
     const user = await prisma.user.findUnique({
-      where: { user_id }
+      where: { user_id: id }
     })
     return user ? this.#toDomain(user) : null
   }
@@ -50,19 +50,17 @@ export class UserRepositoryPrisma extends UserRepositoryPort {
     return user ? this.#toDomain(user) : null
   }
 
-  async updateUser (user_id, data) {
+  async updateMe (id, data) {
     const updateFields = {}
-    const { fullname, email, username, passwordHash, country, active } = data
+    const { fullname, email, username, country } = data
     if (fullname !== undefined) updateFields.fullname = fullname
     if (email !== undefined) updateFields.email = email
     if (username !== undefined) updateFields.username = username
-    if (passwordHash !== undefined) updateFields.passwordHash = passwordHash
     if (country !== undefined) updateFields.country = country
-    if (active !== undefined) updateFields.active = active
 
     try {
       const user = await prisma.user.update({
-        where: { user_id },
+        where: { user_id: id },
         data: updateFields
       })
       return this.#toDomain(user)
@@ -72,10 +70,10 @@ export class UserRepositoryPrisma extends UserRepositoryPort {
     }
   }
 
-  async deleteUser (user_id) {
+  async deleteUser (id) {
     try {
       await prisma.user.delete({
-        where: { user_id }
+        where: { user_id: id }
       })
       return true
     } catch (error) {
@@ -120,7 +118,8 @@ export class UserRepositoryPrisma extends UserRepositoryPort {
       active: user.active,
       country: user.country,
       createdAt: user.createdAt,
-      updatedAt: user.updatedAt
+      updatedAt: user.updatedAt,
+      role: user.role
     })
   }
 }

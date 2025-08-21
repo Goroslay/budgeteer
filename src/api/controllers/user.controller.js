@@ -46,11 +46,12 @@ export const loginUser = async (req, res, next) => {
   }
 }
 
-export const updateUser = async (req, res, next) => {
+export const updateMe = async (req, res, next) => {
   try {
-    const { username, email, country, password, fullname } = req.body
-    const user_id = req.params.id
-    const userResponse = await userService.updateUser({ user_id, username, email, country, password, fullname })
+    const { username, email, country, fullname } = req.body
+    const token = req.headers.authorization
+    if (!token) throw new Error('Invalid authorization token')
+    const userResponse = await userService.updateMe({ token, username, email, country, fullname })
     return res.status(200).json({
       success: true,
       data: userResponse.data
@@ -60,17 +61,32 @@ export const updateUser = async (req, res, next) => {
   }
 }
 
+export const listMe = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization
+    if (!token) throw new Error('Invalid authorization token')
+    const user = await userService.listMe(token)
+    return res.status(200).json({
+      data: user.data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const listUsers = async (req, res, next) => {
   const { id, fullname, username, email, country, active, take, skip } = req.query || undefined
   const where = {}
+  if (id) where.user_id = id
+  if (fullname) where.fullname = fullname
+  if (username) where.username = username
+  if (email) where.email = email
+  if (country) where.country = country
+  if (active !== undefined) where.active = active
+  const token = req.headers.authorization
+  if (!token) throw new Error('Invalid authorization token')
   try {
-    if (id) where.user_id = id
-    if (fullname) where.fullname = fullname
-    if (username) where.username = username
-    if (email) where.email = email
-    if (country) where.country = country
-    if (active !== undefined) where.active = active
-    const usersResponse = await userService.listUsers({ where, take, skip })
+    const usersResponse = await userService.listUsers({ where, take, skip, token })
     return res.status(200).json({
       success: true,
       data: usersResponse.data,

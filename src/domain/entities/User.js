@@ -8,7 +8,8 @@ export class User {
     active = true,
     country,
     createdAt = new Date(),
-    updatedAt = new Date()
+    updatedAt = new Date(),
+    role
   }) {
     this.user_id = user_id
     this.fullname = fullname
@@ -19,6 +20,7 @@ export class User {
     this.country = country
     this.createdAt = new Date(createdAt)
     this.updatedAt = new Date(updatedAt)
+    this.role = role
   }
 
   static create ({
@@ -26,7 +28,8 @@ export class User {
     email,
     username,
     passwordHash,
-    country
+    country,
+    role
   }) {
     return new User({
       fullname,
@@ -36,7 +39,8 @@ export class User {
       country,
       active: true,
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      role
     })
   }
 
