@@ -50,7 +50,7 @@ export class UserRepositoryPrisma extends UserRepositoryPort {
     return user ? this.#toDomain(user) : null
   }
 
-  async updateMe (id, data) {
+  async updateUser (id, data) {
     const updateFields = {}
     const { fullname, email, username, country } = data
     if (fullname !== undefined) updateFields.fullname = fullname

@@ -151,3 +151,39 @@ export class ListUserDTO extends UserDTO {
     return domain
   }
 }
+
+export class UpdateUserDTO extends UserDTO {
+  constructor ({
+    token,
+    id,
+    username = undefined,
+    fullname = undefined,
+    country = undefined,
+    email = undefined
+  }) {
+    super()
+    this.token = token
+    this.id = id
+    this.username = username ? this._normalizeUsername(username) : undefined
+    this.fullname = fullname ? this._normalizeFullname(fullname) : undefined
+    this.country = country ? this._normalizeCountry(country) : undefined
+    this.email = email ? this._normalizeEmail(email) : undefined
+    Object.freeze(this)
+  }
+
+  static fromObject (object = {}) {
+    const { token, id, username, fullname, country, email } = object
+    return new UpdateUserDTO({ token, id, username, fullname, country, email })
+  }
+
+  toDomain () {
+    const domain = {}
+    domain.token = this.token
+    domain.id = this.id
+    if (this.username !== undefined) domain.username = this.username
+    if (this.fullname !== undefined) domain.fullname = this.fullname
+    if (this.country !== undefined) domain.country = this.country
+    if (this.email !== undefined) domain.email = this.email
+    return domain
+  }
+}

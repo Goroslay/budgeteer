@@ -1,5 +1,5 @@
 import { User } from '../../domain/entities/User.js'
-import { ListUserDTO, LoginUserDTO, RegisterUserDTO, UpdateMeDTO } from '../dto/userDTO.js'
+import { ListUserDTO, LoginUserDTO, RegisterUserDTO, UpdateMeDTO, UpdateUserDTO } from '../dto/userDTO.js'
 export class UserService {
   constructor (userRespository, passwordHasher, tokenGenerator) {
     this.userRespository = userRespository
@@ -57,8 +57,8 @@ export class UserService {
   }
 
   async updateMe (updateMeRequest) {
-    const updateMeDto = new UpdateMeDTO(updateMeRequest)
-    const { token, username, fullname, country, email } = updateMeDto.toDomain()
+    const updateMeDTO = new UpdateMeDTO(updateMeRequest)
+    const { token, username, fullname, country, email } = updateMeDTO.toDomain()
     const userDecoded = await this.#decodedToken(token)
     const id = userDecoded.user_id
     if (username) {
@@ -69,9 +69,30 @@ export class UserService {
       const byEmail = await this.userRespository.findUserByEmail(email)
       if (byEmail && byEmail.user_id !== id) throw new Error('Email duplicated')
     }
-    const updatedUser = await this.userRespository.updateMe(id, { username, fullname, country, email })
+    const updatedUser = await this.userRespository.updateUser(id, { username, fullname, country, email })
     return {
       data: updatedUser.toObjectSafe()
+    }
+  }
+
+  async updateUser (updateUserRequest) {
+    const updateUserDTO = new UpdateUserDTO(updateUserRequest)
+    const { token, id, username, email, fullname, country } = updateUserDTO.toDomain()
+    const userDecoded = await this.#decodedToken(token)
+    if (userDecoded.role !== 'admin') throw new Error('Invalid authorization')
+    const userToUpdate = await this.userRespository.findUserById(id)
+    if (!userToUpdate) throw new Error('Invalid user')
+    if (username) {
+      const byUsername = await this.userRespository.findUserByUsername(username)
+      if (byUsername && byUsername.user_id !== id) throw new Error('Username duplicaded')
+    }
+    if (email) {
+      const byEmail = await this.userRespository.findUserByEmail(email)
+      if (byEmail && byEmail.user_id !== id) throw new Error('Email duplicated')
+    }
+    const updateUser = await this.userRespository.updateUser(id, { username, fullname, country, email })
+    return {
+      data: updateUser.toObjectSafe()
     }
   }
 

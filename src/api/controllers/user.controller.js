@@ -61,6 +61,22 @@ export const updateMe = async (req, res, next) => {
   }
 }
 
+export const updateUser = async (req, res, next) => {
+  try {
+    const { username, email, country, fullname } = req.body
+    const { id } = req.params
+    const token = req.headers.authorization
+    if (!token) throw new Error('Invalid authorization')
+    const userResponse = await userService.updateUser({ token, id, username, email, country, fullname })
+    return res.status(200).json({
+      success: true,
+      data: userResponse.data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const listMe = async (req, res, next) => {
   try {
     const token = req.headers.authorization
