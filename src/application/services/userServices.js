@@ -147,7 +147,6 @@ export class UserService {
     const { id } = decoded.payload
     if (!id) throw new Error('Invalid authorization')
     const userDecoded = await this.userRespository.findUserById(id)
-    console.log(userDecoded)
     if (!userDecoded) throw new Error('Invalid User')
     return userDecoded
   }

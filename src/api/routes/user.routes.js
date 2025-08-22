@@ -1,5 +1,7 @@
 import { Router } from 'express'
 import { deleteMe, deleteUser, listMe, listUsers, updateMe, updateUser } from '../controllers/user.controller.js'
+import { validateRequest } from '../middleware/validateRequest.js'
+import { idValidator, updateUserValidator } from '../validators/userValidator.js'
 
 const userRouter = Router()
 
@@ -9,12 +11,12 @@ const userRouter = Router()
 User routes
 PATCH /users/me/password
 */
-userRouter.put('/me', updateMe)
+userRouter.put('/me', updateUserValidator, validateRequest, updateMe)
 userRouter.get('/me', listMe)
 userRouter.delete('/me', deleteMe)
 // admin routes
 userRouter.get('/', listUsers)
-userRouter.delete('/:id', deleteUser)
-userRouter.put('/:id', updateUser)
+userRouter.delete('/:id', idValidator, validateRequest, deleteUser)
+userRouter.put('/:id', idValidator, updateUserValidator, validateRequest, updateUser)
 
 export default userRouter
