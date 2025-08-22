@@ -4,17 +4,22 @@ import { body, param } from 'express-validator'
 const { isCuid } = cuid
 export const registerUserValidator = [
   body('fullname')
+    .notEmpty()
     .trim()
     .isLength({ min: 4, max: 120 }).withMessage('Invalid Name'),
   body('email')
+    .notEmpty()
     .isEmail().withMessage('Invalid email'),
   body('username')
+    .notEmpty()
     .trim()
     .matches(/^[a-zA-Z0-9._-]{3,30}$/).withMessage('Invalid Username'),
   body('country')
+    .notEmpty()
     .trim()
     .isLength({ min: 2 }).withMessage('Invalid country'),
   body('password')
+    .notEmpty()
     .trim()
     .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$/)
     .withMessage('Password must be at least 8 characters long and include uppercase, lowercase, number, and special character')
@@ -57,6 +62,18 @@ export const updateUserValidator = [
     .optional()
     .trim()
     .isLength({ min: 2 }).withMessage('Invalid country')
+]
+
+export const changePasswordValidator = [
+  body('oldPassword')
+    .trim()
+    .notEmpty()
+    .withMessage('Old password is required'),
+  body('newPassword')
+    .trim()
+    .notEmpty()
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&._\-])[A-Za-z\d@$!%*?&._\-]{8,}$/)
+    .withMessage('New password must be at least 8 characters long and include uppercase, lowercase, number, and special character')
 ]
 
 export const idValidator = [

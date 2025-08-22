@@ -52,11 +52,12 @@ export class UserRepositoryPrisma extends UserRepositoryPort {
 
   async updateUser (id, data) {
     const updateFields = {}
-    const { fullname, email, username, country } = data
+    const { fullname, email, username, country, password } = data
     if (fullname !== undefined) updateFields.fullname = fullname
     if (email !== undefined) updateFields.email = email
     if (username !== undefined) updateFields.username = username
     if (country !== undefined) updateFields.country = country
+    if (password !== undefined) updateFields.password = password
 
     try {
       const user = await prisma.user.update({

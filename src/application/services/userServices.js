@@ -40,8 +40,6 @@ export class UserService {
     const loginUserDTO = new LoginUserDTO(loginUserRequest)
     const userData = loginUserDTO.toDomain()
     const { username, email, password } = userData
-    if (!username && !email) throw new Error('Username or email is required')
-    if (!password) throw new Error('Password is required')
     const user = username ? await this.userRespository.findUserByUsername(username) : await this.userRespository.findUserByEmail(email)
     if (!user) throw new Error('Invalid credentials')
 
@@ -140,6 +138,19 @@ export class UserService {
     const userToDelete = await this.userRespository.findUserById(id)
     if (!userToDelete) throw new Error('Invalid User')
     return await this.userRespository.deleteUser(id)
+  }
+
+  async changePassword (changePasswordRequest) {
+    const { token, oldPassword, newPassword } = changePasswordRequest
+    const userDecoded = await this.#decodedToken(token)
+    const isSamePassword = await this.passwordHasher.compare(oldPassword, userDecoded._passwordHash)
+    if (isSamePassword) throw new Error('The password must be different')
+    const newPasswordHash = await this.passwordHasher.hash(newPassword)
+    const userUpdated = await this.userRespository.updateUser(userDecoded.user_id, { password: newPasswordHash })
+    return {
+      success: true,
+      data: userUpdated.toObjectSafe()
+    }
   }
 
   async #decodedToken (token) {

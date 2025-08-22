@@ -139,3 +139,17 @@ export const deleteUser = async (req, res, next) => {
     next(error)
   }
 }
+
+export const changePassword = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization
+    const { oldPassword, newPassword } = req.body
+    if (!token) throw new Error('Invalid authorization')
+    const userResponse = await userService.changePassword({ token, oldPassword, newPassword })
+    return res.status(200).json({
+      success: userResponse.success
+    })
+  } catch (error) {
+    next(error)
+  }
+}
