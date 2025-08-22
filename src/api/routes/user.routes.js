@@ -7,6 +7,7 @@ const userRouter = Router()
 
 /*
 User routes
+PATCH /users/me/password
 */
 userRouter.put('/me', updateMe)
 userRouter.get('/me', listMe)

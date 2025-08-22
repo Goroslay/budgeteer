@@ -125,6 +125,7 @@ export const deleteMe = async (req, res, next) => {
     next(error)
   }
 }
+
 export const deleteUser = async (req, res, next) => {
   try {
     const { id } = req.params
