@@ -50,7 +50,7 @@ export const updateMe = async (req, res, next) => {
   try {
     const { username, email, country, fullname } = req.body
     const token = req.headers.authorization
-    if (!token) throw new Error('Invalid authorization token')
+    if (!token) throw new Error('Invalid authorization')
     const userResponse = await userService.updateMe({ token, username, email, country, fullname })
     return res.status(200).json({
       success: true,
@@ -84,13 +84,39 @@ export const listUsers = async (req, res, next) => {
   if (country) where.country = country
   if (active !== undefined) where.active = active
   const token = req.headers.authorization
-  if (!token) throw new Error('Invalid authorization token')
+  if (!token) throw new Error('Invalid authorization')
   try {
     const usersResponse = await userService.listUsers({ where, take, skip, token })
     return res.status(200).json({
       success: true,
       data: usersResponse.data,
       length: usersResponse.length
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const deleteMe = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization
+    if (!token) throw new Error('Invalid authorization')
+    const userResponse = await userService.deleteMe(token)
+    return res.status(200).json({
+      success: userResponse.data
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+export const deleteUser = async (req, res, next) => {
+  try {
+    const { id } = req.params
+    const token = req.headers.authorization
+    if (!token) throw new Error('Invalid authorization')
+    const userResponse = await userService.deleteUser(id, token)
+    return res.status(200).json({
+      success: userResponse
     })
   } catch (error) {
     next(error)

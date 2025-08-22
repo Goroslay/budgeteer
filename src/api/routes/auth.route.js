@@ -5,6 +5,8 @@ import { createUserValidator } from '../validators/userValidator.js'
 
 const authRouter = Router()
 
+// Faltan validaciones con middleware
+
 authRouter.post('/register', createUserValidator, validateRequest, registerUser)
 authRouter.post('/login', loginUser)
 /*

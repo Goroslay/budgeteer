@@ -61,7 +61,6 @@ export class UserService {
     const { token, username, fullname, country, email } = updateMeDto.toDomain()
     const userDecoded = await this.#decodedToken(token)
     const id = userDecoded.user_id
-    console.log(userDecoded)
     if (username) {
       const byUsername = await this.userRespository.findUserByUsername(username)
       if (byUsername && byUsername.user_id !== id) throw new Error('Username duplicated')
@@ -107,6 +106,19 @@ export class UserService {
     return {
       data: userDecoded.toObjectSafe()
     }
+  }
+
+  async deleteMe (token) {
+    const userDecoded = await this.#decodedToken(token)
+    return await this.userRespository.deleteUser(userDecoded.user_id)
+  }
+
+  async deleteUser (id, token) {
+    const userDecoded = await this.#decodedToken(token)
+    if (userDecoded.role !== 'admin') throw new Error('Invalid authorization')
+    const userToDelete = await this.userRespository.findUserById(id)
+    if (!userToDelete) throw new Error('Invalid User')
+    return await this.userRespository.deleteUser(id)
   }
 
   async #decodedToken (token) {
