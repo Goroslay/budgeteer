@@ -1,9 +1,5 @@
-import { UserRepositoryPrisma } from '../../infrastructure/db/UserRepositoryPrisma.js'
-import { JWTService } from '../../infrastructure/security/JWTService.js'
+import { jwtService, userRepo } from '../../infrastructure/index.js'
 import AppError from '../../utils/AppError.js'
-
-const jwtService = new JWTService()
-const userRepo = new UserRepositoryPrisma()
 
 export async function isAuth (req, res, next) {
   try {
