@@ -49,9 +49,8 @@ export const loginUser = async (req, res, next) => {
 export const updateMe = async (req, res, next) => {
   try {
     const { username, email, country, fullname } = req.body
-    const token = req.headers.authorization
-    if (!token) throw new Error('Invalid authorization')
-    const userResponse = await userService.updateMe({ token, username, email, country, fullname })
+    const user = req.user
+    const userResponse = await userService.updateMe({ user, username, email, country, fullname })
     return res.status(200).json({
       success: true,
       data: userResponse.data
@@ -65,9 +64,7 @@ export const updateUser = async (req, res, next) => {
   try {
     const { username, email, country, fullname } = req.body
     const { id } = req.params
-    const token = req.headers.authorization
-    if (!token) throw new Error('Invalid authorization')
-    const userResponse = await userService.updateUser({ token, id, username, email, country, fullname })
+    const userResponse = await userService.updateUser({ id, username, email, country, fullname })
     return res.status(200).json({
       success: true,
       data: userResponse.data
@@ -79,11 +76,9 @@ export const updateUser = async (req, res, next) => {
 
 export const listMe = async (req, res, next) => {
   try {
-    const token = req.headers.authorization
-    if (!token) throw new Error('Invalid authorization token')
-    const user = await userService.listMe(token)
+    const user = req.user
     return res.status(200).json({
-      data: user.data
+      data: user
     })
   } catch (error) {
     next(error)
@@ -99,10 +94,8 @@ export const listUsers = async (req, res, next) => {
   if (email) where.email = email
   if (country) where.country = country
   if (active !== undefined) where.active = active
-  const token = req.headers.authorization
-  if (!token) throw new Error('Invalid authorization')
   try {
-    const usersResponse = await userService.listUsers({ where, take, skip, token })
+    const usersResponse = await userService.listUsers({ where, take, skip })
     return res.status(200).json({
       success: true,
       data: usersResponse.data,
@@ -115,9 +108,8 @@ export const listUsers = async (req, res, next) => {
 
 export const deleteMe = async (req, res, next) => {
   try {
-    const token = req.headers.authorization
-    if (!token) throw new Error('Invalid authorization')
-    const userResponse = await userService.deleteMe(token)
+    const user = req.user
+    const userResponse = await userService.deleteMe(user)
     return res.status(200).json({
       success: userResponse.data
     })
@@ -129,9 +121,7 @@ export const deleteMe = async (req, res, next) => {
 export const deleteUser = async (req, res, next) => {
   try {
     const { id } = req.params
-    const token = req.headers.authorization
-    if (!token) throw new Error('Invalid authorization')
-    const userResponse = await userService.deleteUser(id, token)
+    const userResponse = await userService.deleteUser(id)
     return res.status(200).json({
       success: userResponse
     })
@@ -142,10 +132,10 @@ export const deleteUser = async (req, res, next) => {
 
 export const changePassword = async (req, res, next) => {
   try {
-    const token = req.headers.authorization
     const { oldPassword, newPassword } = req.body
-    if (!token) throw new Error('Invalid authorization')
-    const userResponse = await userService.changePassword({ token, oldPassword, newPassword })
+    const user = req.user
+    const id = user.user_id
+    const userResponse = await userService.changePassword({ id, oldPassword, newPassword })
     return res.status(200).json({
       success: userResponse.success
     })

@@ -69,7 +69,8 @@ export class User {
       fullname: this.fullname,
       email: this.email,
       username: this.username,
-      country: this.country
+      country: this.country,
+      role: this.role
     }
   }
 }

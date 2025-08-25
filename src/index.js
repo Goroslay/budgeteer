@@ -1,6 +1,7 @@
 import cors from 'cors'
 import express from 'express'
 import helmet from 'helmet'
+import { errorHandler } from './api/middleware/errorHandler.js'
 import { morganMiddleware } from './api/middleware/morgan.js'
 import { rateLimiter } from './api/middleware/rateLimiter.js'
 import indexRouter from './api/routes/index.routes.js'
@@ -19,6 +20,8 @@ app.use(rateLimiter)
 // Routes
 app.use(indexRouter)
 
+// errorHandler
+app.use(errorHandler)
 app.listen(env.port, () => {
   console.log(`Server listen on http://localhost:${env.port}`)
 })

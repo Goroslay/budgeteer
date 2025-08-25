@@ -1,4 +1,5 @@
 import { User } from '../../domain/entities/User.js'
+import AppError from '../../utils/AppError.js'
 import { ListUserDTO, LoginUserDTO, RegisterUserDTO, UpdateMeDTO, UpdateUserDTO } from '../dto/userDTO.js'
 export class UserService {
   constructor (userRespository, passwordHasher, tokenGenerator) {
@@ -15,8 +16,8 @@ export class UserService {
       this.userRespository.findUserByEmail(email),
       this.userRespository.findUserByUsername(username)
     ])
-    if (byEmail) throw new Error('Email duplicated')
-    if (byUsername) throw new Error('Username duplicated')
+    if (byEmail) throw AppError.conflict('Email duplicated')
+    if (byUsername) throw AppError.conflict('Username duplicated')
 
     const passwordHash = await this.passwordHasher.hash(password)
     const newUser = User.create({
@@ -41,10 +42,10 @@ export class UserService {
     const userData = loginUserDTO.toDomain()
     const { username, email, password } = userData
     const user = username ? await this.userRespository.findUserByUsername(username) : await this.userRespository.findUserByEmail(email)
-    if (!user) throw new Error('Invalid credentials')
+    if (!user) throw AppError.unauthorized('Invalid credentials')
 
     const isValidPassword = await this.passwordHasher.compare(password, user._passwordHash)
-    if (!isValidPassword) throw new Error('Invalid credentials')
+    if (!isValidPassword) throw AppError.unauthorized('Invalid credentials')
 
     const token = this.tokenGenerator.generate({ id: user.user_id, role: user.role })
 
@@ -56,16 +57,15 @@ export class UserService {
 
   async updateMe (updateMeRequest) {
     const updateMeDTO = new UpdateMeDTO(updateMeRequest)
-    const { token, username, fullname, country, email } = updateMeDTO.toDomain()
-    const userDecoded = await this.#decodedToken(token)
-    const id = userDecoded.user_id
+    const { user, username, fullname, country, email } = updateMeDTO.toDomain()
+    const id = user.user_id
     if (username) {
       const byUsername = await this.userRespository.findUserByUsername(username)
-      if (byUsername && byUsername.user_id !== id) throw new Error('Username duplicated')
+      if (byUsername && byUsername.user_id !== id) throw AppError.conflict('Username duplicated')
     }
     if (email) {
       const byEmail = await this.userRespository.findUserByEmail(email)
-      if (byEmail && byEmail.user_id !== id) throw new Error('Email duplicated')
+      if (byEmail && byEmail.user_id !== id) throw AppError.conflict('Email duplicated')
     }
     const updatedUser = await this.userRespository.updateUser(id, { username, fullname, country, email })
     return {
@@ -75,18 +75,16 @@ export class UserService {
 
   async updateUser (updateUserRequest) {
     const updateUserDTO = new UpdateUserDTO(updateUserRequest)
-    const { token, id, username, email, fullname, country } = updateUserDTO.toDomain()
-    const userDecoded = await this.#decodedToken(token)
-    if (userDecoded.role !== 'admin') throw new Error('Invalid authorization')
+    const { id, username, email, fullname, country } = updateUserDTO.toDomain()
     const userToUpdate = await this.userRespository.findUserById(id)
-    if (!userToUpdate) throw new Error('Invalid user')
+    if (!userToUpdate) throw AppError.notFound('Invalid user')
     if (username) {
       const byUsername = await this.userRespository.findUserByUsername(username)
-      if (byUsername && byUsername.user_id !== id) throw new Error('Username duplicaded')
+      if (byUsername && byUsername.user_id !== id) throw AppError.conflict('Username duplicated')
     }
     if (email) {
       const byEmail = await this.userRespository.findUserByEmail(email)
-      if (byEmail && byEmail.user_id !== id) throw new Error('Email duplicated')
+      if (byEmail && byEmail.user_id !== id) throw AppError.conflict('Email duplicated')
     }
     const updateUser = await this.userRespository.updateUser(id, { username, fullname, country, email })
     return {
@@ -97,9 +95,6 @@ export class UserService {
   async listUsers (listUsersRequest = {}) {
     const listQuery = { ...listUsersRequest.where, take: listUsersRequest.take, skip: listUsersRequest.skip }
     const listUserDTO = ListUserDTO.fromQuery(listQuery)
-    const token = listUsersRequest.token
-    const userDecoded = await this.#decodedToken(token)
-    if (userDecoded.role !== 'admin') throw new Error('Invalid authorization')
     if (listUserDTO.user_id) {
       const userFind = await this.userRespository.findUserById(listUserDTO.user_id)
       return userFind
@@ -120,45 +115,27 @@ export class UserService {
     }
   }
 
-  async listMe (token) {
-    const userDecoded = await this.#decodedToken(token)
-    return {
-      data: userDecoded.toObjectSafe()
-    }
+  async deleteMe (user) {
+    const id = user.user_id
+    return await this.userRespository.deleteUser(id)
   }
 
-  async deleteMe (token) {
-    const userDecoded = await this.#decodedToken(token)
-    return await this.userRespository.deleteUser(userDecoded.user_id)
-  }
-
-  async deleteUser (id, token) {
-    const userDecoded = await this.#decodedToken(token)
-    if (userDecoded.role !== 'admin') throw new Error('Invalid authorization')
+  async deleteUser (id) {
     const userToDelete = await this.userRespository.findUserById(id)
-    if (!userToDelete) throw new Error('Invalid User')
+    if (!userToDelete) throw AppError.notFound('Invalid User')
     return await this.userRespository.deleteUser(id)
   }
 
   async changePassword (changePasswordRequest) {
-    const { token, oldPassword, newPassword } = changePasswordRequest
-    const userDecoded = await this.#decodedToken(token)
-    const isSamePassword = await this.passwordHasher.compare(oldPassword, userDecoded._passwordHash)
-    if (isSamePassword) throw new Error('The password must be different')
+    const { id, oldPassword, newPassword } = changePasswordRequest
+    const user = await this.userRespository.findUserById(id)
+    const isSamePassword = await this.passwordHasher.compare(oldPassword, user._passwordHash)
+    if (isSamePassword) throw AppError.conflict('The password must be different')
     const newPasswordHash = await this.passwordHasher.hash(newPassword)
-    const userUpdated = await this.userRespository.updateUser(userDecoded.user_id, { password: newPasswordHash })
+    const userUpdated = await this.userRespository.updateUser(id, { password: newPasswordHash })
     return {
       success: true,
       data: userUpdated.toObjectSafe()
     }
-  }
-
-  async #decodedToken (token) {
-    const decoded = this.tokenGenerator.validate(token)
-    const { id } = decoded.payload
-    if (!id) throw new Error('Invalid authorization')
-    const userDecoded = await this.userRespository.findUserById(id)
-    if (!userDecoded) throw new Error('Invalid User')
-    return userDecoded
   }
 }
